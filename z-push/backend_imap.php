@@ -4,7 +4,7 @@
 * Project   :   Z-Push
 * Descr     :   IMAP backend configuration file
 ************************************************/
-define('IMAP_SERVER', 'localhost');
+define('IMAP_SERVER', '172.17.42.1');
 define('IMAP_PORT', 993);
 define('IMAP_OPTIONS', '/ssl/norsh/novalidate-cert');
 define('IMAP_DEFAULTFROM', '');
@@ -30,6 +30,6 @@ define('IMAP_INLINE_FORWARD', true);
 define('IMAP_EXCLUDED_FOLDERS', '');
 define('IMAP_SMTP_METHOD', 'sendmail');
 global $imap_smtp_params;
-$imap_smtp_params = array('host' => 'ssl://localhost', 'port' => 587, 'auth' => true, 'username' => 'imap_username', 'password' => 'imap_password');
+$imap_smtp_params = array('host' => 'ssl://172.17.42.1', 'port' => 587, 'auth' => true, 'username' => 'imap_username', 'password' => 'imap_password');
 define('MAIL_MIMEPART_CRLF', "\r\n");
 ?>

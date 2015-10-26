@@ -4,9 +4,9 @@
 * Project   :   Z-Push
 * Descr     :   CardDAV backend configuration file
 ************************************************/
-define('CARDDAV_PROTOCOL', 'https'); /* http or https */
+define('CARDDAV_PROTOCOL', 'http'); /* http or https */
 define('CARDDAV_SERVER', 'localhost');
-define('CARDDAV_PORT', '443');
+define('CARDDAV_PORT', '80');
 define('CARDDAV_PATH', '/carddav/addressbooks/%u/');
 define('CARDDAV_DEFAULT_PATH', '/carddav/addressbooks/%u/contacts/'); /* subdirectory of the main path */
 define('CARDDAV_GAL_PATH', ''); /* readonly, searchable, not syncd */
