@@ -26,7 +26,9 @@ RUN apt-get update && apt-get --yes --force-yes install \
     php-soap \
     php5-imap \
     libawl-php \
-    php5-xsl
+    php5-xsl \
+    php5-mysql \
+    php5-sqlite
 RUN apt-get --yes clean
 RUN wget https://download.owncloud.org/community/owncloud-8.2.0.tar.bz2 -O /tmp/owncloud-8.2.0.tar.bz2
 RUN tar -C /var/www/html/ --extract --file /tmp/owncloud-8.2.0.tar.bz2
@@ -44,11 +46,27 @@ RUN mv /var/www/html/z-push/backend/imap/config.php /var/www/html/z-push/backend
 RUN mv /var/www/html/z-push/backend/carddav/config.php /var/www/html/z-push/backend/carddav/config.php.ori
 RUN mv /var/www/html/z-push/backend/caldav/config.php /var/www/html/z-push/backend/caldav/config.php.ori
 RUN mv /var/www/html/z-push/autodiscover/config.php /var/www/html/z-push/autodiscover/config.php.ori
-ADD z-push/backend_combined.php /var/www/html/z-push/backend/combined/config.php
-ADD z-push/backend_imap.php /var/www/html/z-push/backend/imap/config.php
-ADD z-push/backend_carddav.php /var/www/html/z-push/backend/carddav/config.php
-ADD z-push/backend_caldav.php /var/www/html/z-push/backend/caldav/config.php
-ADD z-push/autodiscover_config.php /var/www/html/z-push/autodiscover/config.php
+ADD z-push/backend_combined.php /data/conf/z-push
+ADD z-push/backend_imap.php /data/conf/z-push
+ADD z-push/backend_carddav.php /data/conf/z-push
+ADD z-push/backend_caldav.php /data/conf/z-push
+ADD z-push/autodiscover_config.php /data/conf/z-push
+RUN ln -s /data/conf/z-push/backend_combined.php /var/www/html/z-push/backend/combined/config.php
+RUN ln -s /data/conf/z-push/backend_imap.php /var/www/html/z-push/backend/imap/config.php
+RUN ln -s /data/conf/z-push/backend_carddav.php /var/www/html/z-push/backend/carddav/config.php
+RUN ln -s /data/conf/z-push/backend_caldav.php /var/www/html/z-push/backend/caldav/config.php
+RUN ln -s /data/conf/z-push/autodiscover_config.php /var/www/html/z-push/autodiscover/config.php
+RUN chown -h www-data:www-data /var/www/html/z-push/backend/combined/config.php
+RUN chown -h www-data:www-data /var/www/html/z-push/backend/imap/config.php
+RUN chown -h www-data:www-data /var/www/html/z-push/backend/imap/config.php
+RUN chown -h www-data:www-data /var/www/html/z-push/backend/caldav/config.php
+RUN chown -h www-data:www-data /var/www/html/z-push/autodiscover/config.php
+RUN mkdir -p /data/cloud /data/conf/owncloud
+ADD owncloud/config.php /data/conf/owncloud
+RUN mv /var/www/html/mail/data /data/rainloop
+RUN ln -s /data/conf/owncloud/config.php /var/www/html/cloud/config
+RUN chown -h www-data:www-data /var/www/html/mail/data
+RUN chown -h www-data:www-data /var/www/html/cloud/config/config.php
 RUN mkdir -p /var/log/z-push
 RUN mkdir -p /var/lib/z-push
 RUN chmod 750 /var/log/z-push
@@ -57,9 +75,9 @@ RUN chown www-data:www-data /var/log/z-push
 RUN chown www-data:www-data /var/lib/z-push
 RUN wget http://repository.rainloop.net/v2/webmail/rainloop-community-latest.zip -O /tmp/rainloop-community-latest.zip
 RUN cd /var/www/html/mail && unzip /tmp/rainloop-community-latest.zip
-RUN chown -R www-data:www-data /var/www
+RUN chown -R www-data:www-data /var/www /data
 RUN for mod in $(ls /etc/apache2/mods-available); do /usr/sbin/a2enmod $(echo $mod | awk -F'.' '{print $1}') ; done
-RUN mv /etc/apache2/sites-enabled/000-default.conf /etc/apache2/sites-enabled/000-default.conf
-ADD apache2/000-default.conf /etc/apache2/site-enabled/000-default.conf
+RUN mv /etc/apache2/sites-available/000-default.conf /etc/apache2/sites-available/000-default.conf.ori
+ADD apache2/000-default.conf /etc/apache2/sites-available/000-default.conf
 EXPOSE 80
 CMD ["/bin/bash", "-c", "cd /opt/solr; java -jar start.jar"]
