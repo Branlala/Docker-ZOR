@@ -61,10 +61,11 @@ RUN chown -h www-data:www-data /var/www/html/z-push/backend/imap/config.php
 RUN chown -h www-data:www-data /var/www/html/z-push/backend/imap/config.php
 RUN chown -h www-data:www-data /var/www/html/z-push/backend/caldav/config.php
 RUN chown -h www-data:www-data /var/www/html/z-push/autodiscover/config.php
-RUN mkdir -p /data/cloud /data/conf/owncloud
-ADD owncloud/config.php /data/conf/owncloud
+RUN mkdir -p /data/cloud /data/conf/cloud
+ADD owncloud/config.php /data/conf/cloud
 RUN mv /var/www/html/mail/data /data/rainloop
-RUN ln -s /data/conf/owncloud/config.php /var/www/html/cloud/config
+RUN ln -s /data/rainloop /var/www/html/mail/data
+RUN ln -s /data/conf/cloud/config.php /var/www/html/cloud/config
 RUN chown -h www-data:www-data /var/www/html/mail/data
 RUN chown -h www-data:www-data /var/www/html/cloud/config/config.php
 RUN mkdir -p /var/log/z-push
@@ -75,9 +76,13 @@ RUN chown www-data:www-data /var/log/z-push
 RUN chown www-data:www-data /var/lib/z-push
 RUN wget http://repository.rainloop.net/v2/webmail/rainloop-community-latest.zip -O /tmp/rainloop-community-latest.zip
 RUN cd /var/www/html/mail && unzip /tmp/rainloop-community-latest.zip
-RUN chown -R www-data:www-data /var/www /data
+RUN chown -R www-data:www-data /var/www
+RUN chown -R www-data:www-data /data
 RUN for mod in $(ls /etc/apache2/mods-available); do /usr/sbin/a2enmod $(echo $mod | awk -F'.' '{print $1}') ; done
 RUN mv /etc/apache2/sites-available/000-default.conf /etc/apache2/sites-available/000-default.conf.ori
 ADD apache2/000-default.conf /etc/apache2/sites-available/000-default.conf
+ADD start.sh /opt
+RUN touch /data/.installed
+RUN cp -rp /data /data.ori
 EXPOSE 80
-CMD ["/bin/bash", "-c", "cd /opt/solr; java -jar start.jar"]
+CMD ["/bin/bash", "-c", "cd /opt; ./start.sh"]
